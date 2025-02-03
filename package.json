@@ -4,12 +4,17 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "seed:test": "NODE_ENV=test node seedTest.js",
+    "cypress:open": "npm run seed:test && NODE_ENV=test cypress open",
+    "cypress:run": "npm run seed:test && NODE_ENV=test cypress run",
+    "test": "npm run cypress:run"
   },
   "author": "Mark Wagdy",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cypress": "^14.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "joi": "^17.13.3",

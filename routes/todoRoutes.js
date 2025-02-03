@@ -7,7 +7,13 @@ const Todo=require('../models/todo');
 
 todoRouter.get('/',(req, res) => {
     const todos=Todo.findAll();
-    res.status(200).json(todos?todos:'No todos found');
+    if(todos)
+    {
+        res.status(200).json({message:'Todos Found',data:Object.entries(todos)});
+    }
+    else{
+        res.status(404).json({message:'Todos not found'});
+    }
 });
 
 todoRouter.post('/', validateRequest(createValidationSchema), async (req, res) => {
