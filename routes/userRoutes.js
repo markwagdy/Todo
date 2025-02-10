@@ -1,4 +1,6 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const userRouter = express.Router();
 const { validateRequest } = require('../commonMethods');
 const { createUserValidationSchema } = require('../validations/validationSchemas');
@@ -6,8 +8,10 @@ const User = require('../models/users');
 const { Op } = require('sequelize'); 
 const Todo = require('../models/todo');
 
+const SECRET_KEY = process.env.JWT_SECRET
+
+// ✅ Register User
 userRouter.post('/', validateRequest(createUserValidationSchema), async (req, res) => {
-    
     const { userName, password, email } = req.body;
 
     try {
@@ -33,6 +37,33 @@ userRouter.post('/', validateRequest(createUserValidationSchema), async (req, re
     }
 });
 
+// ✅ Login API
+userRouter.post('/login', async (req, res) => {
+    const { username: username, password } = req.body;
+
+    try {
+        const user = await User.findOne({ where: { user_name: username } });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+
+        // Generate JWT Token
+        const token = jwt.sign({ id: user.id, userName: user.user_name }, SECRET_KEY, { expiresIn: '1h' });
+
+        return res.json({ message: 'Login successful', token });
+    } catch (error) {
+        console.error('Error logging in:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+// ✅ Get Users with Todos
 userRouter.get('/:id?', async (req, res) => {
     try {
         const { id } = req.params;
@@ -51,7 +82,7 @@ userRouter.get('/:id?', async (req, res) => {
                 data: user  
             });
         } else {
-            const users = await User.findAll({include:[{model:Todo,as:'todos'}]});
+            const users = await User.findAll({ include: [{ model: Todo, as: 'todos' }] });
 
             return res.status(200).json({
                 message: 'Successfully found users',
@@ -63,6 +94,5 @@ userRouter.get('/:id?', async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 
 module.exports = userRouter;

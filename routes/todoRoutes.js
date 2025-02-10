@@ -3,9 +3,10 @@ const todoRouter = express.Router();
 const {validateRequest,ValidatePathVariable}=require('../commonMethods')
 const {createValidationSchema,putValidationSchema}=require('../validations/validationSchemas')
 const Todo=require('../models/todo');
+const authenticateToken=require('../middleware/authMiddleware')
 
 
-todoRouter.get('/',async(req, res) => {
+todoRouter.get('/',authenticateToken,async(req, res) => {
     const todos=await Todo.findAll();
     if(todos)
     {
@@ -16,7 +17,7 @@ todoRouter.get('/',async(req, res) => {
     }
 });
 
-todoRouter.post('/', validateRequest(createValidationSchema), async (req, res) => {
+todoRouter.post('/',authenticateToken,validateRequest(createValidationSchema), async (req, res) => {
     const { task ,userId} = req.body;
     try {
       const newTodo = await Todo.create({ task,userId });
@@ -29,7 +30,7 @@ todoRouter.post('/', validateRequest(createValidationSchema), async (req, res) =
   });
   
 
-todoRouter.put('/:id', ValidatePathVariable(putValidationSchema),async(req, res) => {
+todoRouter.put('/:id',authenticateToken,ValidatePathVariable(putValidationSchema),async(req, res) => {
     const { id } = req.params;
     const { task } = req.body;
     const updated=await Todo.update({task:task},{where : {id:id}});
@@ -42,7 +43,7 @@ todoRouter.put('/:id', ValidatePathVariable(putValidationSchema),async(req, res)
     }
 });
 
-todoRouter.delete('/:id',ValidatePathVariable(putValidationSchema) ,async(req, res) => {
+todoRouter.delete('/:id',authenticateToken,ValidatePathVariable(putValidationSchema) ,async(req, res) => {
     const { id } = req.params;
     const destroyed=await Todo.destroy({where : {id:id}});
 
@@ -55,7 +56,7 @@ todoRouter.delete('/:id',ValidatePathVariable(putValidationSchema) ,async(req, r
     }
 });
 
-todoRouter.patch('/:id/complete', ValidatePathVariable(putValidationSchema),async(req, res) => {
+todoRouter.patch('/:id/complete',authenticateToken ,ValidatePathVariable(putValidationSchema),async(req, res) => {
     const { id } = req.params;
     const updated=await Todo.update({completed:true},{where:{id:id}});
     if(updated==0)

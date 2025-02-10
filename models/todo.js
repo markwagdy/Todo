@@ -7,10 +7,6 @@ const Todo = sequelize.define('Todo', {
         autoIncrement: true,
         primaryKey: true
     },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
     task: {
         type: DataTypes.STRING,
         allowNull: false
