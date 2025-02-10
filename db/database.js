@@ -10,7 +10,7 @@ const sequelize = new Sequelize(
   {
     host: isTestEnv ? process.env.TEST_DB_HOST : process.env.DB_HOST,
     dialect: isTestEnv ? process.env.TEST_DB_DIALECT : process.env.DB_DIALECT,
-    logging: console.log,
+    logging: false,
   }
 );
 
@@ -21,7 +21,7 @@ sequelize
   .catch((err) => console.error('❌ Unable to connect to the database:', err));
 
 sequelize
-  .sync({ force: isTestEnv })  // Drops and recreates tables only in test mode
+  .sync({ force: isTestEnv,alert:true })  // Drops and recreates tables only in test mode
   .then(() => console.log('✅ Tables created!'))
   .catch((err) => console.error('❌ Error creating tables:', err));
 

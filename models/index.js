@@ -16,6 +16,7 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
+// Load models dynamically
 fs
   .readdirSync(__dirname)
   .filter(file => {
@@ -31,11 +32,15 @@ fs
     db[model.name] = model;
   });
 
+// Setup associations
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
+
+console.log(Object.keys(db)); // Check if "User" and "Todo" are in the output
+
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

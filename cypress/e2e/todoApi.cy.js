@@ -6,15 +6,11 @@ describe("Todo API Tests", () => {
     cy.exec("NODE_ENV=test node seedTest.js", { failOnNonZeroExit: false });
   });
 
-  // after(() => {
-  //   cy.exec("NODE_ENV=test node cleanupTestDB.js", { failOnNonZeroExit: false });
-  // });
+
 
   it("should fetch all todos (GET /todos)", () => {
     cy.request("GET", baseUrl).then((response) => {
       expect(response.status).to.eq(200);
-      cy.log('response.body ---------------------------------------------------',response)
-      console.log('response.body ---------------------------------------------------',response)
       expect(response.body["data"]).to.be.an("array");
     });
   });

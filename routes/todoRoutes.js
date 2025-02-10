@@ -5,11 +5,11 @@ const {createValidationSchema,putValidationSchema}=require('../validations/valid
 const Todo=require('../models/todo');
 
 
-todoRouter.get('/',(req, res) => {
-    const todos=Todo.findAll();
+todoRouter.get('/',async(req, res) => {
+    const todos=await Todo.findAll();
     if(todos)
     {
-        res.status(200).json({message:'Todos Found',data:Object.entries(todos)});
+        res.status(200).json({message:'Todos Found',data:todos});
     }
     else{
         res.status(404).json({message:'Todos not found'});
@@ -17,10 +17,9 @@ todoRouter.get('/',(req, res) => {
 });
 
 todoRouter.post('/', validateRequest(createValidationSchema), async (req, res) => {
-    const { task } = req.body;
-  
+    const { task ,userId} = req.body;
     try {
-      const newTodo = await Todo.create({ task });
+      const newTodo = await Todo.create({ task,userId });
   
       res.status(200).json(newTodo);
     } catch (error) {
